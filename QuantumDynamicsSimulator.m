@@ -39,31 +39,29 @@ classdef QuantumDynamicsSimulator
             obj.initState = prep / sqrt(sum(abs(prep).^2));
         end
 
-        function v = V(obj, A, omega, step)
-            % Calculate the time-dependent potential V(t) = A sin(x) cos(omega * t)
-            t = step * obj.dt;  % Current time
-            v = A * sin(obj.spatialGrid) * cos(omega * t) + obj.spatialGrid(1:obj.numPoints).^2 / 2;
-            
-        end
-
-        function obj = runSimulation(obj, A, omega)
+        function obj = runSimulationSplitOperatorMethod(obj, A, omega)
             % Pre-compute exponential terms for the kinetic energy part
-            UT = exp(-1i * (obj.momentumGrid.^2 / 2) * obj.dt);  % Kinetic term in momentum space
-            UV = exp(-1i * (obj.spatialGrid(1:obj.numPoints).^2 / 2) * obj.dt / 2);  % Potential term in real space
+            % Kinetic term Propagator in momentum space
+            UT = exp(-1i * (obj.momentumGrid.^2 / 2) * obj.dt);
+
+            % Potential term in real space
+            V = @(A, omega, t) (obj.spatialGrid.^2 / 2) + (A * sin(obj.spatialGrid) * cos(omega * t));
         
             cur_psi = obj.initState;
             for m = 1:obj.numSteps
-                cur_psi = exp(-1i * (obj.V(A, omega, m)) * obj.dt / 2) .* cur_psi;  % Apply half-step potential in real space
+                % Compute Potential term Propagator in real space
+                UV = exp(-1i * V(A, omega, m) * obj.dt / 2);
+
+                cur_psi = UV .* cur_psi;  % Apply half-step potential in real space
                 cur_psi = fft(cur_psi);  % Transform to momentum space
                 cur_psi = UT .* cur_psi;  % Apply full-step kinetic in momentum space
                 cur_psi = ifft(cur_psi);  % Transform back to real space
-                cur_psi = exp(-1i * (obj.V(A, omega, m)) * obj.dt / 2) .* cur_psi;  % Apply second half-step potential in real space
+                cur_psi = UV .* cur_psi;  % Apply second half-step potential in real space
         
                 obj.stateEvolution(:, m) = cur_psi;  % Store the state at this time step
             end
             obj.finalState = cur_psi;
         end
-
 
         function [obj, figHandle] = plotResults(obj)
             % Plots the initial and final states' probability densities.
@@ -87,7 +85,7 @@ classdef QuantumDynamicsSimulator
             maxY = max(abs(obj.stateEvolution(:)).^2) * 1.2;
             ylim([0, maxY]);
             xlabel('Position');
-            ylabel('Density');
+            ylabel('Probability Amplitute');
             title('Wavepacket Evolution');
             for m = 2:obj.numSteps
                 set(hPlot, 'YData', obj.getProbabilityAmplitude(obj.stateEvolution(:, m)));
