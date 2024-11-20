@@ -4,7 +4,7 @@ clear;
 clc;
 
 % runSimulation()
-% solveEigenvalEigenfunc()
+solveEigenvalEigenfunc()
 % plotPotentialGraph()
 
 % TODO - Tidy up the plot, include A and omega label in plot
@@ -34,14 +34,14 @@ end
 
 function solveEigenvalEigenfunc
     % DVR parameter
-    LEFT_BOUNDARY = -50
-    RIGHT_BOUNDARY = 50
-    NUM_OF_POINTS = 100
+    LEFT_BOUNDARY = -20
+    RIGHT_BOUNDARY = 20
+    NUM_OF_POINTS = 500
 
     % Potential parameter
-    A = 10
+    A = 0
     OMEGA = 1
-    TIME = 10
+    TIME = pi / 2
 
     % Plot parameter
     EIGENFUCNTION_TO_PLOTS = [1,2,3];
@@ -58,8 +58,9 @@ function solveEigenvalEigenfunc
     % Solve the eigenvalue problem to find eigenstates and eigenvalues
     [DVRSolver, vec, eneg] = DVRSolver.solveEigenproblems();
     
-    % Plot the first two eigenfunctions
+    % Plot the eigenfunctions and eigenvalues
     [DVRSolver, fig] = DVRSolver.plotEigenfunctions(EIGENFUCNTION_TO_PLOTS);
+    [DVRSolver, fig] = DVRSolver.plotEigenenergies(EIGENFUCNTION_TO_PLOTS);
 end
 
 
