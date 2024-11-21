@@ -1,5 +1,3 @@
-% main.m - Script to use the WavePacketSimulation class
-
 clear;
 clc;
 
