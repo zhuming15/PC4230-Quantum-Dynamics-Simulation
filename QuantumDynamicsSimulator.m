@@ -39,6 +39,31 @@ classdef QuantumDynamicsSimulator
             obj.initState = prep / sqrt(sum(abs(prep).^2));
         end
 
+        function obj = initializeSHOstate(obj, n, center)
+            % Initializes the harmonic oscillator wavefunction analytically using Hermite polynomials.
+            % Inputs:
+            %   n     - Quantum number (0 for ground state, 1 for first excited state, etc.)
+            %   hbar  - Reduced Planck's constant
+
+            % Spatial grid defined by obj.spatialGrid
+            x = obj.spatialGrid(1:obj.numPoints) - center;
+            
+            % Set the default value of m (mass of the oscillator), 
+            % omega (angular frequency of the oscillator) and hbar to 1
+            m = 1;
+            omega = 1;
+            hbar = 1;
+            % Calculate the Hermite polynomial for given n
+            H_n = hermiteH(n, sqrt(m * omega / hbar) * x);
+
+            % Calculate the wavefunction
+            normalization = (m * omega / pi / hbar)^(1/4) / sqrt(2^n * factorial(n));  % Normalization constant
+            psi_n = normalization * H_n .* exp(-m * omega * x.^2 / (2 * hbar));
+
+            % Assign to initState
+            obj.initState = psi_n;
+        end
+
         function obj = runSimulationSplitOperatorMethod(obj, A, omega)
             % Pre-compute exponential terms for the kinetic energy part
             % Kinetic term Propagator in momentum space
