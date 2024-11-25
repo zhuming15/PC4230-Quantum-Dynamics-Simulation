@@ -3,7 +3,7 @@ clc;
 
 % runSimulation()
 % solveEigenvalEigenfunc()
-% plotPotentialGraph()
+plotPotentialGraph()
 
 
 % Methodology
@@ -81,18 +81,19 @@ function runSimulation
     RIGHT_BOUNDARY = 50
     NUM_OF_POINTS = 1000
     TOT_TIME = 10 * pi
-    NUM_OF_STEPS = 10000
+    NUM_OF_STEPS = 1000
 
     %initial state parameter of Guassian Wavapacket
-    X_0 = 0
+    X_0 = 10
     SIGMA = 1
 
     % potential parameter
-    A = 1000
+    A = 0
     OMEGA = 0.5
     
     sim = QuantumDynamicsSimulator(LEFT_BOUNDARY, RIGHT_BOUNDARY, NUM_OF_POINTS, TOT_TIME, NUM_OF_STEPS);
-    sim = sim.initializeWavePacket(X_0, SIGMA)
+    sim = sim.initializeWavePacket(X_0, SIGMA) % Use Gaussian wave packet
+    sim = sim.initializeSHOstate(0, X_0) % Use analytical form of wavefunc
     sim = sim.runSimulationSplitOperatorMethod(A,OMEGA);
     
     [sim, fig] = sim.plotResults();
