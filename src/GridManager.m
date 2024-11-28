@@ -27,6 +27,11 @@ classdef GridManager
             % Getter for momentum grid
             momentumGrid = obj.momentumGrid;
         end
+
+        function numPoints = getNumPoints(obj)
+            % Getter for number of spatial grid points
+            numPoints = obj.numPoints;
+        end
     end
 
     methods (Access = private)
