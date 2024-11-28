@@ -18,7 +18,7 @@ classdef TestWavefunction < matlab.unittest.TestCase
             testCase.spatialGrid = leftBoundary + L * (0:numPoints-1) / numPoints;
 
             % Inject mock grid into the Wavefunction class
-            testCase.wavefunction = Wavefunction(struct('spatialGrid', testCase.spatialGrid));
+            testCase.wavefunction = Wavefunction(struct('getSpatialGrid', testCase.spatialGrid));
         end
     end
 

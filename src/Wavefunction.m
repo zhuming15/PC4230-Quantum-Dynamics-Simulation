@@ -10,7 +10,7 @@ classdef Wavefunction
         %% Constructor
         function obj = Wavefunction(gridManager)
             % Constructor to initialize with spatial grid
-            obj.grid = gridManager.spatialGrid;
+            obj.grid = gridManager.getSpatialGrid();
         end
 
         %% Initialization
