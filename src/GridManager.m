@@ -1,7 +1,7 @@
 classdef GridManager
     % GRIDMANAGER Handles spatial and momentum grid generation.
 
-    properties
+    properties (Access = private)
         leftBoundary   % Start of spatial domain
         rightBoundary  % End of spatial domain
         numPoints      % Number of spatial grid points
@@ -17,7 +17,19 @@ classdef GridManager
             obj.numPoints = numPoints;
             [obj.spatialGrid, obj.momentumGrid] = obj.generateGrids();
         end
-    
+
+        function spatialGrid = getSpatialGrid(obj)
+            % Getter for spatial grid
+            spatialGrid = obj.spatialGrid;
+        end
+
+        function momentumGrid = getMomentumGrid(obj)
+            % Getter for momentum grid
+            momentumGrid = obj.momentumGrid;
+        end
+    end
+
+    methods (Access = private)
         function [spatialGrid, momentumGrid] = generateGrids(obj)
             % Generate spatial and momentum grids
             L = obj.rightBoundary - obj.leftBoundary;

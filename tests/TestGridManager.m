@@ -12,7 +12,7 @@ classdef TestGridManager < matlab.unittest.TestCase
             gridManager = GridManager(leftBoundary, rightBoundary, numPoints);
 
             % Verify spatial grid properties
-            spatialGrid = gridManager.spatialGrid;
+            spatialGrid = gridManager.getSpatialGrid();
         end
 
         function testMomentumGridSymmetry(testCase)
@@ -25,7 +25,7 @@ classdef TestGridManager < matlab.unittest.TestCase
             gridManager = GridManager(leftBoundary, rightBoundary, numPoints);
 
             % Verify momentum grid size
-            momentumGrid = gridManager.momentumGrid;
+            momentumGrid = gridManager.getMomentumGrid();
             testCase.verifyEqual(length(momentumGrid), numPoints, ...
                 'Momentum grid does not have the correct number of points.');
 
@@ -45,7 +45,7 @@ classdef TestGridManager < matlab.unittest.TestCase
             gridManager = GridManager(leftBoundary, rightBoundary, numPoints);
 
             % Verify spatial grid boundaries
-            spatialGrid = gridManager.spatialGrid;
+            spatialGrid = gridManager.getSpatialGrid();
             testCase.verifyEqual(spatialGrid(1), leftBoundary, 'AbsTol', 1e-6, ...
                 'Spatial grid does not start at the left boundary.');
             
