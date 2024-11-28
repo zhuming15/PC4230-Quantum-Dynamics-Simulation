@@ -41,6 +41,24 @@ classdef Wavefunction
             energy = HBAR * OMEGA * (n + 0.5);
         end
 
+        %% Inner Product
+        function innerProd = innerProduct(obj, otherKet)
+            % INNERPRODUCT Computes the inner product with another ket
+            % INPUT:
+            %   - otherKet: The wavefunction (ket) to take the inner product with
+            % OUTPUT:
+            %   - innerProd: The resulting complex scalar value of the inner product
+    
+            % Validate dimensions
+            if length(obj.state) ~= length(otherKet)
+                error('Wavefunction:DimensionMismatch', ...
+                      'The input ket must have the same dimension as the current wavefunction.');
+            end
+    
+            % Compute the inner product using the DVR basis
+            innerProd = sum(conj(obj.state) .* otherKet);
+        end
+
         %% Utility Functions
         function normalizedState = normalize(~, state)
             % Normalize a wavefunction
