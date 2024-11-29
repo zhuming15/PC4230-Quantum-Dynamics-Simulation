@@ -4,6 +4,7 @@ classdef Wavefunction
     properties
         state       % Wavefunction state (complex array)
         grid        % Spatial grid associated with the wavefunction
+        params      % Parameters for the wavefunction
     end
 
     methods
@@ -14,14 +15,15 @@ classdef Wavefunction
         end
 
         %% Initialization
-        function obj = initializeGaussian(obj, center, width)
-            % Initialize a Gaussian wavepacket
-            psi = exp(-(obj.grid - center).^2 / (2 * width^2));
-            obj.state = obj.normalize(psi);
-        end
+        % function obj = initializeGaussian(obj, center, width)
+        %     % Initialize a Gaussian wavepacket
+        %     psi = exp(-(obj.grid - center).^2 / (2 * width^2));
+        %     obj.state = obj.normalize(psi);
+        % end
 
         function obj = initializeHarmonicOscillator(obj, params)
             % Initialize superposition of SHO states
+            obj.params = params;
             combinedState = zeros(size(obj.grid));
             for k = 1:numel(params.bases)
                 [basis, ~] = obj.generateHermiteBasis(params.bases(k), params.center, ...
@@ -36,7 +38,8 @@ classdef Wavefunction
             x = obj.grid - center;
             xi = sqrt(M * OMEGA / HBAR) * x;
             H_n = hermiteH(n, xi);
-            basis = H_n .* exp(-xi.^2 / 2);
+            % normalization = (M * OMEGA / pi / HBAR)^(1/4) / sqrt(2^n * factorial(n));  % Normalization constant
+            basis = 1 * H_n .* exp(-M * OMEGA* x.^2 / (2 * HBAR));
             basis = obj.normalize(basis);
             energy = HBAR * OMEGA * (n + 0.5);
         end
@@ -60,9 +63,10 @@ classdef Wavefunction
         end
 
         %% Utility Functions
-        function normalizedState = normalize(~, state)
+        function normalizedState = normalize(obj, state)
             % Normalize a wavefunction
-            normalizedState = state / norm(state);
+            normalizedState = state / sqrt(sum(abs(state).^2));
+            %disp(sum(abs(normalizedState).^2));
         end
 
         function probDensity = computeProbabilityDensity(obj)
