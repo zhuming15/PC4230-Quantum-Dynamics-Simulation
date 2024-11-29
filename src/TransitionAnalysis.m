@@ -3,29 +3,24 @@ classdef TransitionAnalysis
     % numerical and analytical methods.
 
     methods (Static)
-        function prob = computeNumericalTransition(stateAtT, targetState)
+        function prob = computeNumericalP_nm(stateAtT, targetState)
             prob = abs((conj(targetState(:))' * stateAtT)).^2;
         end
 
-        % function prob = computeAnalyticalTransition(potential, omega, omega_nm, t)
-        % 
-        %     % Compute potential term (constant factor)
-        %     potentialTerm = 4 * abs(sum(potential))^2;
-        % 
-        %     % Frequency difference factor
-        %     freqDiff = omega - omega_nm;
-        %     if abs(freqDiff) < 1e-10
-        %         freqFactor = (t / 2)^2; % Special case for resonance (freqDiff ~ 0)
-        %     else
-        %         freqFactor = (sin(freqDiff * t / 2) / freqDiff)^2;
-        %     end
-        % 
-        %     % Compute transition probability
-        %     prob = potentialTerm * freqFactor;
-        % end
+        function prob = computeAnalyticalP_nmWithRWA(V_nm, omega, omega_nm, t)
+            freqDiff = omega - omega_nm;
+            freqFactor = sin(freqDiff * t / 2) / freqDiff;
+            prob = 4 * (abs(V_nm) * freqFactor)^2;
+        end
+
+        function prob = computeAnalyticalP_nm(V_nm, omega, omega_nm, t)
+            term1 = (exp(1i * (omega_nm + omega) * t) - 1) / (omega_nm + omega);
+            term2 = (exp(1i * (omega_nm - omega) * t) - 1) / (omega_nm - omega);
+            prob = abs(V_nm * (term1 + term2))^2;
+        end
 
         function fig = plotNumericalTransitionProbability(stateEvolution, targetState, timeVector)
-            transitionProbs = TransitionAnalysis.computeNumericalTransition(stateEvolution, targetState);
+            transitionProbs = TransitionAnalysis.computeNumericalP_nm(stateEvolution, targetState);
 
             fig = figure;
             plot(timeVector, transitionProbs, 'LineWidth', 2);
@@ -33,16 +28,15 @@ classdef TransitionAnalysis
             xlabel('Time'); ylabel('Transition Probability'); grid on;
         end
 
-        % function fig = plotAnalyticalTransition(potential, omega, omega_nm, spatialGrid, timeVector)
-        %     % Compute transition probabilities over all time points
-        %     transitionProbs = arrayfun(@(t) TransitionAnalysis.computeAnalyticalTransition( ...
-        %         potential, omega, omega_nm, t), timeVector);
-        % 
-        %     % Plot transition probabilities
-        %     fig = figure;
-        %     plot(timeVector, transitionProbs, 'LineWidth', 2);
-        %     title('Transition Probability (Analytical)');
-        %     xlabel('Time'); ylabel('Transition Probability'); grid on;
-        % end
+        function fig = plotAnalyticalTransitionProbability(V_nm, omega, omega_nm, timeVector)
+            % Compute transition probabilities over all time points
+            transitionProbs = arrayfun(@(t) TransitionAnalysis.computeAnalyticalP_nm( ...
+                V_nm, omega, omega_nm, t), timeVector);
+
+            fig = figure;
+            plot(timeVector, transitionProbs, 'LineWidth', 2);
+            title('Transition Probability (Analytical)');
+            xlabel('Time'); ylabel('Transition Probability'); grid on;
+        end
     end
 end

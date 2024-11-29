@@ -52,7 +52,7 @@ classdef QuantumSimulator
 
         function fig = plotNumericalTransitionProbability(obj, targetState)
             numFrames = size(obj.stateEvolution, 2);
-            timeVector = linspace(0, obj.totalTime, obj.numSteps);
+            timeVector = linspace(0, obj.totalTime, numFrames);
             fig = TransitionAnalysis.plotNumericalTransitionProbability( ...
                 obj.stateEvolution, ...
                 targetState.state, ...
@@ -60,10 +60,12 @@ classdef QuantumSimulator
                 );
         end
 
-        function fig = plotAnalyticalTransitionProbability(obj, V_nm, omega, targetState)
+        function fig = plotAnalyticalTransitionProbability(obj, V, omega, targetState)
             omega_nm = abs(targetState.params.bases - obj.wavefunction.params.bases);
-            disp(omega_nm);
-            numFrames = size(obj.stateEvolution, 2)
+            V_nm = sum(conj(obj.wavefunction.state) .* V .* targetState.state);
+            disp(V_nm);
+            disp(10000);
+            numFrames = size(obj.stateEvolution, 2);
             timeVector = linspace(0, obj.totalTime, numFrames);
             fig = TransitionAnalysis.plotAnalyticalTransitionProbability( ...
                 V_nm, ...
@@ -99,7 +101,7 @@ classdef QuantumSimulator
             hold(ax1, 'on');
             realPartPlot = plot(ax1, spatialGrid, real(obj.stateEvolution(:, 1)), 'b', 'LineWidth', 1.5, 'DisplayName', 'Real Part');
             imagPartPlot = plot(ax1, spatialGrid, imag(obj.stateEvolution(:, 1)), 'g', 'LineWidth', 1.5, 'DisplayName', 'Imaginary Part');
-            potentialPlot1 = plot(ax1, spatialGrid, potentialOverlay, 'k--', 'LineWidth', 1.2, 'DisplayName', 'Potential');
+            % potentialPlot1 = plot(ax1, spatialGrid, potentialOverlay, 'k--', 'LineWidth', 1.2, 'DisplayName', 'Potential');
             title(ax1, 'Real/Imaginary Parts with Potential Overlay');
             xlabel(ax1, 'Position');
             ylabel(ax1, 'Amplitude / Potential');
@@ -109,8 +111,8 @@ classdef QuantumSimulator
 
             ax2 = subplot(1, 2, 2);
             hold(ax2, 'on');
-            probDensityPlot = plot(ax2, spatialGrid, abs(obj.stateEvolution(:, 1))^2, 'r', 'LineWidth', 1.5);
-            potentialPlot2 = plot(ax2, spatialGrid, potentialOverlay, 'k--', 'LineWidth', 1.2, 'DisplayName', 'Potential');
+            probDensityPlot = plot(ax2, spatialGrid, abs(obj.stateEvolution(:, 1)).^2, 'r', 'LineWidth', 1.5);
+            % potentialPlot2 = plot(ax2, spatialGrid, potentialOverlay, 'k--', 'LineWidth', 1.2, 'DisplayName', 'Potential');
             title(ax2, 'Probability Density');
             xlabel(ax2, 'Position');
             ylabel(ax2, 'Density');
@@ -129,8 +131,8 @@ classdef QuantumSimulator
                 % Update potential overlay for the current time (if time-dependent)
                 currentTime = timeGrid(frame);
                 potentialOverlay = potentialFunc(spatialGrid, currentTime); % Time-dependent potential
-                potentialPlot1.YData = potentialOverlay;
-                potentialPlot2.YData = potentialOverlay;
+                % potentialPlot1.YData = potentialOverlay;
+                % potentialPlot2.YData = potentialOverlay;
 
                 % Update wavefunction plots
                 realPartPlot.YData = real(obj.stateEvolution(:, frame));
