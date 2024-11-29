@@ -2,28 +2,36 @@ classdef Propagators
     % PROPAGATORS Handles kinetic and potential propagators for quantum systems.
 
     properties
-        kineticEnergyFunc     % Function handle for kinetic energy
-        potentialEnergyFunc   % Function handle for potential energy
+        gridManager          % Instance of GridManager
+        kineticEnergyFunc    % Function handle for kinetic energy
+        potentialEnergyFunc  % Function handle for potential energy
     end
 
     methods
-        function obj = Propagators(kineticEnergyFunc, potentialEnergyFunc)
+        function obj = Propagators(gridManager, kineticEnergyFunc, potentialEnergyFunc)
+            % Constructor to initialize the propagators
+            obj.gridManager = gridManager;
             obj.kineticEnergyFunc = kineticEnergyFunc;
             obj.potentialEnergyFunc = potentialEnergyFunc;
         end
 
-        function UT = generateKineticPropagator(obj, momentumGrid, dt)
+        function kineticProp = generateKineticPropagator(obj, dt)
             % Generate the kinetic propagator
-            UT = exp(-1i * obj.kineticEnergyFunc(momentumGrid) * dt);
+            pGrid = obj.gridManager.getMomentumGrid(); % Access via getter
+            kineticProp = exp(-1i * obj.kineticEnergyFunc(pGrid) * dt);
         end
 
-        function UV_list = generatePotentialPropagators(obj, spatialGrid, dt, totalTime, numSteps)
-            % Generate the potential propagators for each time step
-            times = linspace(0, totalTime, numSteps);
-            UV_list = cell(1, numSteps); % Preallocate cell array
+        function potentialPropList = generatePotentialPropagators(obj, dt, totalTime, numSteps)
+            % Generate the potential propagators for the entire simulation
+            spatialGrid = obj.gridManager.getSpatialGrid(); % Access via getter
+            timeGrid = linspace(0, totalTime, numSteps);
+
+            % Preallocate cell array for propagators
+            potentialPropList = cell(1, numSteps);
+
             for k = 1:numSteps
-                potentialEnergy = obj.potentialEnergyFunc(spatialGrid, times(k));
-                UV_list{k} = exp(-1i * potentialEnergy * dt / 2);
+                potentialEnergy = obj.potentialEnergyFunc(spatialGrid, timeGrid(k));
+                potentialPropList{k} = exp(-1i * potentialEnergy * dt / 2);
             end
         end
     end
