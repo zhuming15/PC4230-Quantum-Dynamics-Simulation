@@ -15,8 +15,8 @@ classdef TestPropagators < matlab.unittest.TestCase
         function createTestInstance(testCase)
             % Define test parameters
             testCase.gridManager = GridManager(100, 100, 10000); % Example grid manager
-            testCase.spatialGrid = testCase.gridManager.spatialGrid;
-            testCase.momentumGrid = testCase.gridManager.momentumGrid;
+            testCase.spatialGrid = testCase.gridManager.getSpatialGrid();
+            testCase.momentumGrid = testCase.gridManager.getMomentumGrid();
             testCase.totalTime = 2 * pi; % Total time
             testCase.numSteps = 20000; % Number of steps
             testCase.dt = 2 * pi / 20000; % Time step
@@ -26,14 +26,14 @@ classdef TestPropagators < matlab.unittest.TestCase
             potentialEnergyFunc = @(x, t) x.^2 + sin(t); % Harmonic potential with time-dependence
             
             % Create instance of the Propagators class
-            testCase.propagator = Propagators(kineticEnergyFunc, potentialEnergyFunc);
+            testCase.propagator = Propagators(testCase.gridManager, kineticEnergyFunc, potentialEnergyFunc);
         end
     end
     
     methods (Test)
         function testKineticPropagator(testCase)
             % Test the kinetic propagator generation
-            UT = testCase.propagator.generateKineticPropagator(testCase.momentumGrid, testCase.dt);
+            UT = testCase.propagator.generateKineticPropagator(testCase.dt);
             
             % Verify size and type
             testCase.verifySize(UT, size(testCase.momentumGrid));
@@ -49,7 +49,7 @@ classdef TestPropagators < matlab.unittest.TestCase
         function testPotentialPropagators(testCase)
             % Test the potential propagators generation
             UV_list = testCase.propagator.generatePotentialPropagators( ...
-                testCase.spatialGrid, testCase.dt, testCase.totalTime, testCase.numSteps);
+                testCase.dt, testCase.totalTime, testCase.numSteps);
             
             % Verify size and type of the output
             testCase.verifyEqual(numel(UV_list), testCase.numSteps);
