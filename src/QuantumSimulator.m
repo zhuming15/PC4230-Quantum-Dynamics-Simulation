@@ -63,9 +63,8 @@ classdef QuantumSimulator
         function fig = plotAnalyticalTransitionProbability(obj, V, omega, targetState)
             omega_nm = abs(targetState.params.bases - obj.wavefunction.params.bases);
             V_nm = sum(conj(obj.wavefunction.state) .* V .* targetState.state);
-            disp(V_nm);
-            disp(10000);
             numFrames = size(obj.stateEvolution, 2);
+
             timeVector = linspace(0, obj.totalTime, numFrames);
             fig = TransitionAnalysis.plotAnalyticalTransitionProbability( ...
                 V_nm, ...
