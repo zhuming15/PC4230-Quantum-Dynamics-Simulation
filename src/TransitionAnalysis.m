@@ -6,7 +6,7 @@ classdef TransitionAnalysis
         function prob = computeNumericalP_nm(stateAtT, targetState)
             prob = abs((conj(targetState(:))' * stateAtT)).^2;
         end
-
+        
         function prob = computeAnalyticalP_nmWithRWA(V_nm, omega, omega_nm, t)
             freqDiff = omega - omega_nm;
             freqFactor = sin(freqDiff * t / 2) / freqDiff;
@@ -32,7 +32,6 @@ classdef TransitionAnalysis
             % Compute transition probabilities over all time points
             transitionProbs = arrayfun(@(t) TransitionAnalysis.computeAnalyticalP_nm( ...
                 V_nm, omega, omega_nm, t), timeVector);
-
             fig = figure;
             plot(timeVector, transitionProbs, 'LineWidth', 2);
             title('Transition Probability (Analytical)');
